@@ -15,31 +15,30 @@ import (
 type Account struct {
 	AccountID string
 	odata.Resource
+	Response acctResponse
 }
 
 type AcctGetter interface {
 	AcctGet(ctx context.Context, AccountID string) (*acctResponse, error)
 }
 
-func AcctGet(ctx context.Context, AccountID string) (*acctResponse, error) {
-	var acc Account
-	acc.AccountID = AccountID
+func AcctGet(ctx context.Context, acct Account) (*acctOutput, error) {
 
-	resp, err := acc.Get(ctx, acc.AccountID)
+	resp, err := acct.Get(ctx, acct.AccountID)
 	if err != nil {
-		return nil, fmt.Errorf("error calling resource %s", acc.AccountID)
+		return nil, fmt.Errorf("error calling resource %s", acct.AccountID)
 	}
 
-	// unmarshall
-	var accResp acctResponse
-	err = json.NewDecoder(*resp).Decode(&accResp)
+	err = json.NewDecoder(*resp).Decode(&acct.Response)
 	if err != nil {
 		return nil, err
 	}
 
-	return &accResp, nil
+	acctOutput := convRespToOutput(&acct.Response)
+	return acctOutput, nil
 
 }
+
 func (a *Account) Get(ctx context.Context, AccountID any) (*io.ReadCloser, error) {
 
 	accountid := fmt.Sprintf("%v", AccountID)
@@ -118,4 +117,29 @@ func (a *Account) Insert(ctx context.Context, body any) (*io.ReadCloser, error) 
 
 	r := io.NopCloser(strings.NewReader(resp.Status))
 	return &r, nil
+}
+
+func convRespToOutput(resp *acctResponse) *acctOutput {
+	acctop := acctOutput{
+		AccountTypeID:             resp.D.AccountTypeID,
+		AccountID:                 resp.D.AccountID,
+		AccountTitleID:            resp.D.AccountTitleID,
+		FirstName:                 resp.D.FirstName,
+		LastName:                  resp.D.LastName,
+		MiddleName:                resp.D.MiddleName,
+		SecondName:                resp.D.SecondName,
+		Sex:                       resp.D.Sex,
+		Name1:                     resp.D.Name1,
+		Name2:                     resp.D.Name2,
+		Name3:                     resp.D.Name3,
+		Name4:                     resp.D.Name4,
+		GroupName1:                resp.D.GroupName1,
+		GroupName2:                resp.D.GroupName2,
+		FullName:                  resp.D.FullName,
+		CorrespondenceLanguage:    resp.D.CorrespondenceLanguage,
+		CorrespondenceLanguageISO: resp.D.CorrespondenceLanguageISO,
+		Language:                  resp.D.Language,
+		LanguageISO:               resp.D.LanguageISO,
+	}
+	return &acctop
 }
