@@ -26,6 +26,7 @@ func NewHost(h Host) *Host {
 type Resource struct {
 	Name      string
 	Host      Host
+	SapClient string
 	AuthToken string
 	CsrfToken string
 }
@@ -34,12 +35,13 @@ func NewResource(r Resource) *Resource {
 	return &Resource{
 		Name:      r.Name,
 		Host:      r.Host,
+		SapClient: r.SapClient,
 		AuthToken: r.AuthToken,
 		CsrfToken: r.CsrfToken,
 	}
 }
 
-func NewCSRFToken(ctx context.Context, hostUrl string, auth string) (*string, error) {
+func NewCSRFToken(ctx context.Context, hostUrl string, auth string, clnt string) (*string, error) {
 
 	Url := hostUrl + RootResource + "$metadata"
 
@@ -53,6 +55,7 @@ func NewCSRFToken(ctx context.Context, hostUrl string, auth string) (*string, er
 
 	request.Header.Add("Authorization", auth)
 	request.Header.Add("X-Csrf-Token", "fetch")
+	request.Header.Add("sap-client", clnt)
 
 	//calling the URL
 	client := http.Client{}

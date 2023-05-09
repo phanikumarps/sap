@@ -66,6 +66,7 @@ func (a *Account) Get(ctx context.Context, AccountID any) (*io.ReadCloser, error
 	defer request.Body.Close()
 
 	request.Header.Add("Authorization", a.Resource.AuthToken)
+	request.Header.Add("sap-client", a.Resource.SapClient)
 
 	client := http.Client{}
 	resp, err := client.Do(request)
@@ -106,6 +107,7 @@ func (a *Account) Insert(ctx context.Context, body any) (*io.ReadCloser, error) 
 	defer request.Body.Close()
 
 	request.Header.Add("Authorization", a.Resource.AuthToken)
+	request.Header.Add("sap-client", a.Resource.SapClient)
 	request.Header.Add("X-Csrf-Token", a.Resource.CsrfToken)
 
 	client := http.Client{}

@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func NewCSRFToken(ctx context.Context, host string, auth string) (*string, error) {
+func NewCSRFToken(ctx context.Context, host string, auth string, clnt string) (*string, error) {
 
 	Url := host + RootResource + "$metadata"
 
@@ -20,6 +20,7 @@ func NewCSRFToken(ctx context.Context, host string, auth string) (*string, error
 
 	request.Header.Add("Authorization", auth)
 	request.Header.Add("X-Csrf-Token", "fetch")
+	request.Header.Add("sap-client", clnt)
 
 	//calling the URL
 	client := http.Client{}
