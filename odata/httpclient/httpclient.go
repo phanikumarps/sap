@@ -76,7 +76,9 @@ func Default(authToken string) *Client {
 
 func (c *Client) Call(ctx context.Context, httpMethod string, rootResource string, resource string, body io.Reader) (*http.Response, error) {
 	h := c.Host.host + ":" + c.Host.port
-	u := h + rootResource + resource
+	// build response format
+	f := "?" + "$format=" + "json"
+	u := h + rootResource + resource + f
 
 	request, err := http.NewRequest(httpMethod, u, body)
 
