@@ -25,7 +25,7 @@ func NewService(host, port, sapClient, authToken string) *Service {
 }
 func (s *Service) GetAccount(ctx context.Context, id string) (*http.Response, error) {
 	resource := httpclient.RequestOptions{Path: fmt.Sprintf(GetAccountUrl, id)}
-	resp, err := s.Call(ctx, http.MethodGet, odata.RootResource, resource.Path, nil)
+	resp, err := s.Call(ctx, http.MethodGet, odata.RootResource, resource.Path, nil, "json")
 	if err != nil {
 		return nil, err
 	}

@@ -74,11 +74,16 @@ func Default(authToken string) *Client {
 	)
 }
 
-func (c *Client) Call(ctx context.Context, httpMethod string, rootResource string, resource string, body io.Reader) (*http.Response, error) {
+func (c *Client) Call(ctx context.Context, httpMethod string, rootResource string, resource string, body io.Reader, format string) (*http.Response, error) {
 	h := c.Host.host + ":" + c.Host.port
 	// build response format
-	f := "?" + "$format=" + "json"
-	u := h + rootResource + resource + f
+
+	u := h + rootResource + resource
+
+	if format == "json" {
+		f := "?" + "$format=" + "json"
+		u = u + f
+	}
 
 	request, err := http.NewRequest(httpMethod, u, body)
 
@@ -95,7 +100,7 @@ func (c *Client) Call(ctx context.Context, httpMethod string, rootResource strin
 
 	request.Header.Add("Authorization", c.authToken)
 
-	if httpMethod == http.MethodGet {
+	if httpMethod == http.MethodGet || httpMethod == http.MethodHead {
 		request.Header.Add("X-Csrf-Token", "fetch")
 	} else {
 		request.Header.Add("X-Csrf-Token", c.csrfToken)
