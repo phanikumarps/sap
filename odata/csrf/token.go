@@ -1,4 +1,4 @@
-package metadata
+package csrf
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/phanikumarps/sap/odata/httpclient"
 )
 
-func NewCSRFToken(ctx context.Context, host, port, clnt, auth string) (*string, error) {
+func NewToken(ctx context.Context, host, port, clnt, auth string) (*string, error) {
 	s := NewService(
 		host,
 		port,
@@ -39,7 +39,8 @@ func NewService(host, port, sapClient, authToken string) *Service {
 func (s *Service) Get() (*string, error) {
 	ctx := context.TODO()
 	resource := httpclient.RequestOptions{Path: Url}
-	resp, err := s.Call(ctx, http.MethodHead, odata.RootResource, resource.Path, nil, "")
+	r := odata.DefaultRootPath("ZERP_ISU_UMC")
+	resp, err := s.Call(ctx, http.MethodHead, string(*r)+"/", resource.Path, nil, "")
 	if err != nil {
 		return nil, err
 	}
