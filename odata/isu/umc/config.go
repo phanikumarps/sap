@@ -1,4 +1,4 @@
-package umccfg
+package umc
 
 import (
 	"os"
