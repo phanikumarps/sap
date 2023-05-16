@@ -5,11 +5,11 @@ type Host struct {
 	port    string
 }
 
-func NewHost(h Host) *Host {
+func NewHost(host, port string) *Host {
 
 	return &Host{
-		address: h.address,
-		port:    h.port,
+		address: host,
+		port:    port,
 	}
 }
 
