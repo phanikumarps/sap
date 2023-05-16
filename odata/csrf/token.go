@@ -8,10 +8,9 @@ import (
 	"github.com/phanikumarps/sap/odata/httpclient"
 )
 
-func NewToken(ctx context.Context, host, port, clnt, auth string) (*string, error) {
+func NewToken(ctx context.Context, host, clnt, auth string) (*string, error) {
 	s := NewService(
 		host,
-		port,
 		clnt,
 		auth,
 	)
@@ -26,19 +25,19 @@ type Service struct {
 	httpclient.Client
 }
 
-func NewService(host, port, sapClient, authToken string) *Service {
+func NewService(host, sapClient, authToken string) *Service {
 	s := new(Service)
 	s.Client = *httpclient.New(
 		httpclient.WithHost(host),
-		httpclient.WithPort(port),
 		httpclient.WithSapClient(sapClient),
 		httpclient.WithAuthToken(authToken),
 	)
 	return s
 }
+
 func (s *Service) Get() (*string, error) {
 	ctx := context.TODO()
-	resource := httpclient.RequestOptions{Path: Url}
+	resource := httpclient.RequestOptions{Path: ""}
 	r := config.DefaultRootPath("ZERP_ISU_UMC")
 	resp, err := s.Call(ctx, http.MethodHead, string(*r)+"/", resource.Path, nil, "")
 	if err != nil {
@@ -47,7 +46,3 @@ func (s *Service) Get() (*string, error) {
 	t := resp.Header.Get("X-Csrf-Token")
 	return &t, nil
 }
-
-const (
-	Url = "$metadata"
-)

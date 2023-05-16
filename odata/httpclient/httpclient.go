@@ -10,7 +10,6 @@ import (
 
 type Host struct {
 	host      string
-	port      string
 	sapClient string
 }
 
@@ -32,12 +31,6 @@ func New(options ...optionalFunc) *Client {
 func WithHost(host string) optionalFunc {
 	return func(c *Client) {
 		c.Host.host = host
-	}
-}
-
-func WithPort(port string) optionalFunc {
-	return func(c *Client) {
-		c.Host.port = port
 	}
 }
 
@@ -68,18 +61,14 @@ func WithCsrfToken(csrfToken string) optionalFunc {
 func Default(authToken string) *Client {
 	return New(
 		WithHost(defaultHost.host),
-		WithPort(defaultHost.port),
 		WithSapClient(defaultHost.sapClient),
 		WithAuthToken(authToken),
 	)
 }
 
 func (c *Client) Call(ctx context.Context, httpMethod string, rootResource string, resource string, body io.Reader, format string) (*http.Response, error) {
-	h := c.Host.host + ":" + c.Host.port
+	u := c.Host.host + rootResource + resource
 	// build response format
-
-	u := h + rootResource + resource
-
 	if format == "json" {
 		f := "?" + "$format=" + "json"
 		u = u + f

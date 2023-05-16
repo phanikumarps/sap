@@ -2,14 +2,12 @@ package config
 
 type Host struct {
 	address string
-	port    string
 }
 
-func NewHost(host, port string) *Host {
+func NewHost(host string) *Host {
 
 	return &Host{
 		address: host,
-		port:    port,
 	}
 }
 
@@ -34,6 +32,10 @@ func NewResource(host Host, name, rootPath, sapClient, authToken string) *Resour
 }
 
 func DefaultRootPath(service string) *RootPath {
+	if service == "" {
+		r := RootPath("/sap/opu/odata/sap/")
+		return &r
+	}
 	r := RootPath("/sap/opu/odata/sap/" + service + "/")
 	return &r
 }

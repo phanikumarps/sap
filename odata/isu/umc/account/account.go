@@ -13,11 +13,10 @@ type Service struct {
 	httpclient.Client
 }
 
-func NewService(host, port, sapClient, authToken string) *Service {
+func NewService(host, sapClient, authToken string) *Service {
 	s := new(Service)
 	s.Client = *httpclient.New(
 		httpclient.WithHost(host),
-		httpclient.WithPort(port),
 		httpclient.WithSapClient(sapClient),
 		httpclient.WithAuthToken(authToken),
 	)
