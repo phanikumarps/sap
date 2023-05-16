@@ -21,17 +21,15 @@ type Resource struct {
 	rootPath  string
 	sapClient string
 	authToken string
-	csrfToken string
 }
 
-func NewResource(r Resource) *Resource {
+func NewResource(host Host, name, rootPath, sapClient, authToken string) *Resource {
 	return &Resource{
-		name:      r.name,
-		host:      r.host,
-		rootPath:  r.rootPath,
-		sapClient: r.sapClient,
-		authToken: r.authToken,
-		csrfToken: r.csrfToken,
+		name:      name,
+		host:      host,
+		rootPath:  rootPath,
+		sapClient: sapClient,
+		authToken: authToken,
 	}
 }
 
