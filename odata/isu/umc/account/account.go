@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/phanikumarps/sap/odata/httpclient"
-	"github.com/phanikumarps/sap/odata/isu/umc/config"
+	config "github.com/phanikumarps/sap/odata/umc/umccfg"
 )
 
 type Service struct {
