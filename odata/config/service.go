@@ -1,15 +1,15 @@
-package odata
+package config
 
 type Host struct {
-	Address string
-	Port    string
+	address string
+	port    string
 }
 
 func NewHost(h Host) *Host {
 
 	return &Host{
-		Address: h.Address,
-		Port:    h.Port,
+		address: h.address,
+		port:    h.port,
 	}
 }
 

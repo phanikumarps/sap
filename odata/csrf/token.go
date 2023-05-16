@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/phanikumarps/sap/odata"
+	"github.com/phanikumarps/sap/odata/config"
 	"github.com/phanikumarps/sap/odata/httpclient"
 )
 
@@ -39,7 +39,7 @@ func NewService(host, port, sapClient, authToken string) *Service {
 func (s *Service) Get() (*string, error) {
 	ctx := context.TODO()
 	resource := httpclient.RequestOptions{Path: Url}
-	r := odata.DefaultRootPath("ZERP_ISU_UMC")
+	r := config.DefaultRootPath("ZERP_ISU_UMC")
 	resp, err := s.Call(ctx, http.MethodHead, string(*r)+"/", resource.Path, nil, "")
 	if err != nil {
 		return nil, err

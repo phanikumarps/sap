@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/phanikumarps/sap/odata"
 	"github.com/phanikumarps/sap/odata/httpclient"
+	"github.com/phanikumarps/sap/odata/isu/umc/config"
 )
 
 type Service struct {
@@ -25,7 +25,7 @@ func NewService(host, port, sapClient, authToken string) *Service {
 }
 func (s *Service) GetAccount(ctx context.Context, id string) (*http.Response, error) {
 	resource := httpclient.RequestOptions{Path: fmt.Sprintf(GetAccountUrl, id)}
-	r := odata.DefaultRootPath("ZERP_ISU_UMC")
+	r := config.DefaultUmcRootPath()
 	resp, err := s.Call(ctx, http.MethodGet, string(*r)+"/", resource.Path, nil, "json")
 	if err != nil {
 		return nil, err
@@ -34,5 +34,5 @@ func (s *Service) GetAccount(ctx context.Context, id string) (*http.Response, er
 }
 
 const (
-	GetAccountUrl = "/accounts('%s')"
+	GetAccountUrl = "/Accounts('%s')"
 )
