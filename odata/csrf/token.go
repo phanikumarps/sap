@@ -2,7 +2,6 @@ package csrf
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 
@@ -47,34 +46,4 @@ func (s *Service) Get() (*string, error) {
 	}
 	t := resp.Header.Get("X-Csrf-Token")
 	return &t, nil
-}
-
-func GetTest(Url string) (*string, error) {
-	request, err := http.NewRequest(http.MethodGet, Url, nil)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	defer func() {
-		_ = request.Body.Close()
-	}()
-
-	//calling the URL
-	transport := &http.Transport{
-		Proxy: http.ProxyURL(nil),
-	}
-
-	//adding the Transport object to the http Client
-	client := &http.Client{
-		Transport: transport,
-	}
-
-	resp, err := client.Do(request)
-	if err != nil {
-		//log.Println(err)
-		return nil, err
-	}
-
-	return &resp.Status, nil
 }

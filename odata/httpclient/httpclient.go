@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"net/url"
 )
 
 type Host struct {
@@ -92,18 +91,11 @@ func (c *Client) Call(ctx context.Context, httpMethod string, rootResource strin
 	}
 
 	//calling the URL
-	transport := &http.Transport{
-		Proxy: http.ProxyURL(proxyURL(c.proxy)),
-	}
-
-	//adding the Transport object to the http Client
-	client := &http.Client{
-		Transport: transport,
-	}
+	client := http.Client{}
 
 	resp, err := client.Do(request)
 	if err != nil {
-		//log.Println(err)
+		log.Println(err)
 		return nil, err
 	}
 	defer func() {
@@ -116,14 +108,6 @@ func (c *Client) Call(ctx context.Context, httpMethod string, rootResource strin
 
 type RequestOptions struct {
 	Path string
-}
-
-func proxyURL(Url string) *url.URL {
-	u, err := url.Parse(Url)
-	if err != nil {
-		log.Println(err)
-	}
-	return u
 }
 
 var defaultHost Host

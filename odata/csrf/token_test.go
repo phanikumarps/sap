@@ -8,14 +8,18 @@ import (
 	"github.com/phanikumarps/sap/odata/csrf"
 )
 
-func TestGetTest(t *testing.T) {
-	exp := "200 OK"
+func TestGet(t *testing.T) {
+
 	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
+		w.Header().Add("X-Csrf-Token", "token")
+		w.Header().Add("Authorization", "auth")
+		w.Header().Add("sap-client", "100")
 	}))
 	defer svr.Close()
 
-	got, err := csrf.GetTest(svr.URL)
+	exp := "token"
+	s := csrf.NewService(svr.URL, "100", "auth")
+	got, err := s.Get()
 	if err != nil {
 		t.Error("error here")
 		t.Errorf(err.Error())
