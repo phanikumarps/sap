@@ -81,10 +81,6 @@ func (c *Client) Call(ctx context.Context, httpMethod string, rootResource strin
 		return nil, err
 	}
 
-	defer func() {
-		_ = request.Body.Close()
-	}()
-
 	request.Header.Add("sap-client", c.sapClient)
 
 	request.Header.Add("Authorization", c.authToken)
@@ -110,6 +106,9 @@ func (c *Client) Call(ctx context.Context, httpMethod string, rootResource strin
 		//log.Println(err)
 		return nil, err
 	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	return resp, nil
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/phanikumarps/sap/odata/config"
 	"github.com/phanikumarps/sap/odata/httpclient"
@@ -39,8 +40,8 @@ func NewService(host, sapClient, authToken string) *Service {
 func (s *Service) Get() (*string, error) {
 	ctx := context.TODO()
 	resource := httpclient.RequestOptions{Path: ""}
-	r := config.DefaultRootPath("ZERP_ISU_UMC")
-	resp, err := s.Call(ctx, http.MethodHead, string(*r)+"/", resource.Path, nil, "")
+	r := config.DefaultRootPath(os.Getenv("UMC_SERVICE"))
+	resp, err := s.Call(ctx, http.MethodHead, string(*r), resource.Path, nil, "")
 	if err != nil {
 		return nil, err
 	}
