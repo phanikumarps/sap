@@ -1,5 +1,7 @@
 package config
 
+import "github.com/phanikumarps/sap/odata/httpclient"
+
 type Host struct {
 	address string
 }
@@ -38,4 +40,18 @@ func DefaultRootPath(service string) *RootPath {
 	}
 	r := RootPath("/sap/opu/odata/sap/" + service + "/")
 	return &r
+}
+
+type Service struct {
+	httpclient.Client
+}
+
+func NewService(host, sapClient, authToken string) *Service {
+	s := new(Service)
+	s.Client = *httpclient.New(
+		httpclient.WithHost(host),
+		httpclient.WithSapClient(sapClient),
+		httpclient.WithAuthToken(authToken),
+	)
+	return s
 }
