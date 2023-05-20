@@ -1,19 +1,8 @@
 package account
 
-import (
-	"bytes"
-	"context"
-	"encoding/json"
-	"fmt"
-	"io"
-	"net/http"
-	"os"
-
-	"github.com/phanikumarps/sap/odata/httpclient"
-)
-
+/*
 type Srv struct {
-	client *httpclient.Clnt
+	client *httpclient.Client
 }
 
 type Account struct {
@@ -70,3 +59,4 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 	return http.DefaultTransport.RoundTrip(r)
 }
+*/

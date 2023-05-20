@@ -1,7 +1,7 @@
 package account
 
-func ConvRespToOutput(resp *acctResponse) *acctOutput {
-	acctop := acctOutput{
+func ConvRespToOutput(resp *AcctResponse) *AcctOutput {
+	acctop := AcctOutput{
 		AccountTypeID:             resp.D.AccountTypeID,
 		AccountID:                 resp.D.AccountID,
 		AccountTitleID:            resp.D.AccountTitleID,

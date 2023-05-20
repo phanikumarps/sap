@@ -11,24 +11,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type Srv struct {
-	client *httpclient.Clnt
-}
-
-func NewSrv(host, auth string) *Srv {
-	s := new(Srv)
-	s.client = httpclient.NewClnt(
-		http.DefaultClient,
-		httpclient.Options{
-			HostUrl:   host,
-			RootPath:  os.Getenv("UMC_SERVICE"),
-			SapClient: os.Getenv("SAP_CLIENT"),
-			AuthToken: auth,
-			Verbose:   false,
-		})
-	return s
-}
-
 // CheckErrors checks if there was a err or the response returned with a non-viable status and returns an error if so.
 func CheckErrors(response *http.Response, err error) error {
 	if err != nil {
@@ -74,4 +56,14 @@ func HandleResponse[T any](response *http.Response, err error, deserializationTa
 	}
 
 	return deserializationTarget, nil
+}
+
+func SetDefaults() *httpclient.Options {
+	o := httpclient.Options{
+		HostUrl:   os.Getenv("SAP_HOST"),
+		RootPath:  os.Getenv("UMC_SERVICE"),
+		SapClient: os.Getenv("SAP_CLIENT"),
+		AuthToken: os.Getenv("SAP_AUTH"),
+	}
+	return &o
 }

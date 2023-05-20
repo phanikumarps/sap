@@ -9,6 +9,24 @@ import (
 	"net/http/httputil"
 )
 
+type Service struct {
+	client *Client
+}
+
+func NewService(options Options) *Service {
+	s := new(Service)
+	s.client = NewClnt(
+		http.DefaultClient,
+		Options{
+			HostUrl:   options.HostUrl,
+			RootPath:  options.RootPath,
+			SapClient: options.SapClient,
+			AuthToken: options.AuthToken,
+			Verbose:   options.Verbose,
+		})
+	return s
+}
+
 type TokenFetcher interface {
 	Head(ctx context.Context, path string) (csrf string, err error)
 }
@@ -36,19 +54,19 @@ type Options struct {
 	Verbose   bool
 }
 
-type Clnt struct {
+type Client struct {
 	httpclient *http.Client
 	options    *Options
 }
 
-func NewClnt(httpClient *http.Client, options Options) *Clnt {
-	return &Clnt{
+func NewClnt(httpClient *http.Client, options Options) *Client {
+	return &Client{
 		httpclient: httpClient,
 		options:    &options,
 	}
 }
 
-func (c *Clnt) Get(ctx context.Context, path string) (*http.Response, error) {
+func (c *Client) Get(ctx context.Context, path string) (*http.Response, error) {
 	u := c.options.HostUrl + c.options.RootPath + path
 	if path != "" {
 		// build response format
