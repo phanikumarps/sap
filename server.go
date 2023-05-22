@@ -16,7 +16,7 @@ func main() {
 func run() {
 	mux := http.NewServeMux()
 	ctx, cancelCtx := context.WithCancel(context.Background())
-	serverOne := &http.Server{
+	server := &http.Server{
 		Addr:    ":3333",
 		Handler: mux,
 		BaseContext: func(l net.Listener) context.Context {
@@ -26,7 +26,7 @@ func run() {
 	}
 	mux.HandleFunc("/", rootHandler)
 	go func() {
-		err := serverOne.ListenAndServe()
+		err := server.ListenAndServe()
 		if errors.Is(err, http.ErrServerClosed) {
 			fmt.Printf("server one closed\n")
 		} else if err != nil {
