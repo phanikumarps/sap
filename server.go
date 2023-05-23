@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -14,6 +16,31 @@ func main() {
 }
 
 func run() {
+
+	startCmd := flag.NewFlagSet("start", flag.ExitOnError)
+
+	stopCmd := flag.NewFlagSet("stop", flag.ExitOnError)
+
+	if len(os.Args) < 2 {
+		fmt.Println("expected 'start' or 'stop' subcommands")
+		os.Exit(1)
+	}
+
+	switch os.Args[1] {
+
+	case "start":
+		startCmd.Parse(os.Args[2:])
+		startServer()
+	case "stop":
+		stopCmd.Parse(os.Args[2:])
+	default:
+		fmt.Println("expected 'start' or 'stop' subcommands")
+		os.Exit(1)
+	}
+
+}
+
+func startServer() {
 	mux := http.NewServeMux()
 	ctx, cancelCtx := context.WithCancel(context.Background())
 	server := &http.Server{
