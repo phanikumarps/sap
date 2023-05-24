@@ -6,9 +6,12 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"net"
+	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func main() {
@@ -42,15 +45,15 @@ func run() {
 
 func startServer() {
 	mux := http.NewServeMux()
-	ctx, cancelCtx := context.WithCancel(context.Background())
+
 	server := &http.Server{
 		Addr:    ":3333",
 		Handler: mux,
-		BaseContext: func(l net.Listener) context.Context {
-			ctx = context.WithValue(ctx, keyServerAddr, l.Addr().String())
-			return ctx
-		},
 	}
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
 	mux.HandleFunc("/", rootHandler)
 	go func() {
 		err := server.ListenAndServe()
@@ -59,9 +62,22 @@ func startServer() {
 		} else if err != nil {
 			fmt.Printf("error listening for server one: %s\n", err)
 		}
-		cancelCtx()
 	}()
-	<-ctx.Done()
+	log.Print("Server Started")
+
+	<-done
+	log.Print("Server Stopped")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer func() {
+		// extra handling here
+		cancel()
+	}()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Server Shutdown Failed:%+v", err)
+	}
+	log.Print("Server Exited Properly")
 }
 
 type serverAddr string
