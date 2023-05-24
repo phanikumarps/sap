@@ -29,13 +29,23 @@ func run() {
 		os.Exit(1)
 	}
 
+	var server *http.Server
+	var err error
 	switch os.Args[1] {
 
 	case "start":
 		startCmd.Parse(os.Args[2:])
-		startServer()
+		server, err = startServer()
+		if err != nil {
+			if errors.Is(err, http.ErrServerClosed) {
+				fmt.Printf("server closed\n")
+			} else if err != nil {
+				fmt.Printf("error listening for server: %s\n", err)
+			}
+		}
 	case "stop":
 		stopCmd.Parse(os.Args[2:])
+		stopServer(server)
 	default:
 		fmt.Println("expected 'start' or 'stop' subcommands")
 		os.Exit(1)
@@ -43,7 +53,7 @@ func run() {
 
 }
 
-func startServer() {
+func startServer() (*http.Server, error) {
 	mux := http.NewServeMux()
 
 	server := &http.Server{
@@ -55,17 +65,21 @@ func startServer() {
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	mux.HandleFunc("/", rootHandler)
-	go func() {
+	go func() error {
 		err := server.ListenAndServe()
-		if errors.Is(err, http.ErrServerClosed) {
-			fmt.Printf("server one closed\n")
-		} else if err != nil {
-			fmt.Printf("error listening for server one: %s\n", err)
+		if err != nil {
+			return err
 		}
+		return nil
 	}()
 	log.Print("Server Started")
-
 	<-done
+
+	return server, nil
+
+}
+
+func stopServer(s *http.Server) {
 	log.Print("Server Stopped")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -74,7 +88,7 @@ func startServer() {
 		cancel()
 	}()
 
-	if err := server.Shutdown(ctx); err != nil {
+	if err := s.Shutdown(ctx); err != nil {
 		log.Fatalf("Server Shutdown Failed:%+v", err)
 	}
 	log.Print("Server Exited Properly")
