@@ -78,8 +78,14 @@ func runServerCommands(c *Command) error {
 		fmt.Printf("server subcommand %s", c.fs.Arg(2))
 	case "start":
 		fmt.Printf("server subcommand %s", c.fs.Arg(2))
+		Server, err := startServer()
+		if err != nil {
+			fmt.Printf("error listening for server: %s\n", err)
+		}
+		fmt.Printf("started server at %s", Server.Addr)
 	case "stop":
 		fmt.Printf("server subcommand %s", c.fs.Arg(2))
+		stopServer(SAPServer)
 	default:
 		return fmt.Errorf("unknown sub-command %s", c.fs.Arg(2))
 	}

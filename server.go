@@ -12,10 +12,12 @@ import (
 	"time"
 )
 
+/*
 func main() {
 	run()
 }
 
+/*
 func run() {
 
 	err := runCommand(os.Args[1:])
@@ -55,10 +57,14 @@ func run() {
 			fmt.Println("expected 'start' or 'stop' subcommands")
 			os.Exit(1)
 		}
-	*/
+*/
 
+// }
+
+type Server struct{
+	startServer() (*http.Server, error)
+	
 }
-
 func startServer() (*http.Server, error) {
 	mux := http.NewServeMux()
 
