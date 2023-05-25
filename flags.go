@@ -26,7 +26,7 @@ func runCommand(args []string) error {
 }
 
 func runServer() error {
-	cmds := []Commander{
+	cmds := []Execute{
 		newServerCommand(),
 	}
 
@@ -92,7 +92,7 @@ type Command struct {
 	name string
 }
 
-type Commander interface {
+type Execute interface {
 	Name() string
 	Init([]string) error
 	Run() error
