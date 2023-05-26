@@ -61,10 +61,6 @@ func run() {
 
 // }
 
-type Server struct{
-	startServer() (*http.Server, error)
-	
-}
 func startServer() (*http.Server, error) {
 	mux := http.NewServeMux()
 
