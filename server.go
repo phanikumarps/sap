@@ -12,55 +12,6 @@ import (
 	"time"
 )
 
-/*
-func main() {
-	run()
-}
-
-/*
-func run() {
-
-	err := runCommand(os.Args[1:])
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	/*
-		startCmd := flag.NewFlagSet("start", flag.ExitOnError)
-
-		stopCmd := flag.NewFlagSet("stop", flag.ExitOnError)
-
-		if len(os.Args) < 2 {
-			fmt.Println("expected 'start' or 'stop' subcommands")
-			os.Exit(1)
-		}
-
-		var server *http.Server
-		var err error
-		switch os.Args[1] {
-
-		case "start":
-			startCmd.Parse(os.Args[2:])
-			server, err = startServer()
-			if err != nil {
-				if errors.Is(err, http.ErrServerClosed) {
-					fmt.Printf("server closed\n")
-				} else if err != nil {
-					fmt.Printf("error listening for server: %s\n", err)
-				}
-			}
-		case "stop":
-			stopCmd.Parse(os.Args[2:])
-			stopServer(server)
-		default:
-			fmt.Println("expected 'start' or 'stop' subcommands")
-			os.Exit(1)
-		}
-*/
-
-// }
-
 func startServer() (*http.Server, error) {
 	mux := http.NewServeMux()
 
