@@ -1,13 +1,18 @@
-package main
+package cmd
 
 import (
 	"errors"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
+
+	"github.com/phanikumarps/sap/server"
 )
 
-func runCommand(args []string) error {
+var SAPServer *http.Server
+
+func RunCommand(args []string) error {
 
 	if len(args) < 1 {
 		return errors.New("subcommands missing")
@@ -78,14 +83,14 @@ func runServerCommands(c *Command) error {
 		fmt.Printf("server subcommand %s", c.fs.Arg(2))
 	case "start":
 		fmt.Printf("server subcommand %s", c.fs.Arg(2))
-		Server, err := startServer()
+		Server, err := server.StartServer()
 		if err != nil {
 			fmt.Printf("error listening for server: %s\n", err)
 		}
 		fmt.Printf("started server at %s", Server.Addr)
 	case "stop":
 		fmt.Printf("server subcommand %s", c.fs.Arg(2))
-		stopServer(SAPServer)
+		server.StopServer(SAPServer)
 	default:
 		return fmt.Errorf("unknown sub-command %s", c.fs.Arg(2))
 	}

@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func startServer() (*http.Server, error) {
+func StartServer() (*http.Server, error) {
 	mux := http.NewServeMux()
 
 	server := &http.Server{
@@ -38,7 +38,7 @@ func startServer() (*http.Server, error) {
 
 }
 
-func stopServer(s *http.Server) {
+func StopServer(s *http.Server) {
 	log.Print("Server Stopped")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
