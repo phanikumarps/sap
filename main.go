@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/phanikumarps/sap/cmd"
@@ -10,7 +10,7 @@ import (
 func main() {
 	err := cmd.RunCommand(os.Args[1:])
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		os.Exit(1)
 	}
 }
