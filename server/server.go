@@ -12,19 +12,22 @@ import (
 	"time"
 )
 
+type resource struct {
+}
 type SapServer struct {
+	resource resource
 	*http.Server
+	Router *http.ServeMux
 }
 
 func NewSapServer(addr string) *SapServer {
-
-	mux := http.NewServeMux()
-
+	r := resource{}
+	m := http.NewServeMux()
 	s := &http.Server{
 		Addr:    addr,
-		Handler: mux,
+		Handler: m,
 	}
-	return &SapServer{s}
+	return &SapServer{r, s, m}
 }
 func (s *SapServer) StopServer() error {
 	log.Print("Server Stopped")
@@ -35,7 +38,7 @@ func (s *SapServer) StopServer() error {
 		cancel()
 	}()
 
-	if err := s.Shutdown(ctx); err != nil {
+	if err := s.Server.Shutdown(ctx); err != nil {
 		log.Fatalf("Server Shutdown Failed:%+v", err)
 	}
 	log.Print("Server Exited Properly")
@@ -48,7 +51,8 @@ func (s *SapServer) StartServer() error {
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() error {
-		err := s.ListenAndServe()
+
+		err := s.Server.ListenAndServe()
 		if err != nil {
 			return err
 		}
