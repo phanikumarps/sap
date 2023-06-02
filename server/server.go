@@ -2,8 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -65,6 +63,14 @@ func (s *SapServer) StartServer() error {
 
 }
 
+/*
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))
+	io.WriteString(w, "This is my website!\n")
+}
+
 func StartServer() (*http.Server, error) {
 	mux := http.NewServeMux()
 
@@ -109,10 +115,4 @@ func StopServer(s *http.Server) {
 type serverAddr string
 
 const keyServerAddr serverAddr = "serverAddr"
-
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-
-	ctx := r.Context()
-	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))
-	io.WriteString(w, "This is my website!\n")
-}
+*/

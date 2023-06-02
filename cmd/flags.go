@@ -4,13 +4,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"net/http"
+	"log"
 	"os"
 
 	"github.com/phanikumarps/sap/server"
 )
-
-var SAPServer *http.Server
 
 func RunCommand(args []string) error {
 
@@ -20,17 +18,20 @@ func RunCommand(args []string) error {
 
 	switch os.Args[1] {
 	case "server":
-		return runServer()
+		return cmdServer()
 	case "services":
-		fmt.Println("services command")
+		log.Println("services command")
+	case "config":
+		log.Println("config command")
 	default:
-		return fmt.Errorf("unknown command %s", os.Args[1])
+		var cmd string
+		log.Printf("unknown command %s", cmd)
 	}
 
 	return nil
 }
 
-func runServer() error {
+func cmdServer() error {
 	cmds := []Execute{
 		newServerCommand(),
 	}
@@ -58,15 +59,14 @@ func (c *Command) Run() error {
 
 	switch c.fs.Arg(1) {
 	case "server":
-		fmt.Println("command", c.fs.Arg(1))
-		err := runServerCommands(c)
-		if err != nil {
+		log.Println("sub-command", c.fs.Arg(1))
+		if err := runServerCommands(c); err != nil {
 			return err
 		}
 	case "services":
-		fmt.Println("command", c.fs.Arg(1))
+		log.Println("sub-command", c.fs.Arg(1))
 	default:
-		fmt.Println("unknown sub-command", c.fs.Arg(1))
+		return fmt.Errorf("unknown sub-command %s", c.fs.Arg(1))
 	}
 	return nil
 
@@ -78,19 +78,27 @@ func runServerCommands(c *Command) error {
 		return errors.New("subcommands for server missing")
 	}
 
+	var s *server.SapServer
+
 	switch c.fs.Arg(2) {
 	case "ls":
-		fmt.Printf("server subcommand %s", c.fs.Arg(2))
+		log.Printf("server subcommand %s", c.fs.Arg(2))
 	case "start":
-		fmt.Printf("server subcommand %s", c.fs.Arg(2))
-		Server, err := server.StartServer()
+		log.Printf("server subcommand %s", c.fs.Arg(2))
+		s = server.NewSapServer("3333")
+		// s, err := server.StartServer()
+		err := s.StartServer()
 		if err != nil {
-			fmt.Printf("error listening for server: %s\n", err)
+			log.Printf("error listening for server: %s\n", err)
 		}
-		fmt.Printf("started server at %s", Server.Addr)
+		log.Printf("started server at %s", s.Addr)
 	case "stop":
-		fmt.Printf("server subcommand %s", c.fs.Arg(2))
-		server.StopServer(SAPServer)
+		log.Printf("server subcommand %s", c.fs.Arg(2))
+		if err := s.StopServer(); err != nil {
+			log.Fatal(err)
+			return err
+		}
+		// server.StopServer(s)
 	default:
 		return fmt.Errorf("unknown sub-command %s", c.fs.Arg(2))
 	}
