@@ -1,51 +1,41 @@
 package isu
 
-import (
-	"context"
-	"encoding/json"
-	"net/http"
+// type resource struct {
+// 	server.Server
+// }
 
-	"github.com/phanikumarps/sap/odata/isu/umc"
-	"github.com/phanikumarps/sap/server"
-	"github.com/rs/zerolog/log"
-)
+// func (r *resource) handleAccount() http.HandlerFunc {
+// 	// any closure logic here
+// 	return func(w http.ResponseWriter, r *http.Request) {
 
-type resource struct {
-	server.SapServer
-}
+// 		h := "https://saptq1.fpl.com" + "443"
+// 		u := umc.NewService(h, "token")
+// 		ctx := context.TODO()
+// 		var accountID string
 
-func (r *resource) handleAccount() http.HandlerFunc {
-	// any closure logic here
-	return func(w http.ResponseWriter, r *http.Request) {
+// 		resp, err := u.GetAccount(ctx, accountID)
+// 		if err != nil {
+// 			log.Err(err)
+// 		}
 
-		h := "https://saptq1.fpl.com" + "443"
-		u := umc.NewService(h, "token")
-		ctx := context.TODO()
-		var accountID string
+// 		err = json.NewEncoder(w).Encode(resp)
+// 		if err != nil {
+// 			log.Err(err)
+// 		}
 
-		resp, err := u.GetAccount(ctx, accountID)
-		if err != nil {
-			log.Err(err)
-		}
+// 	}
+// }
 
-		err = json.NewEncoder(w).Encode(resp)
-		if err != nil {
-			log.Err(err)
-		}
+// func (r *resource) handleContractAccount() http.HandlerFunc {
+// 	// any closure logic here
+// 	return func(w http.ResponseWriter, r *http.Request) {
 
-	}
-}
+// 	}
+// }
 
-func (r *resource) handleContractAccount() http.HandlerFunc {
-	// any closure logic here
-	return func(w http.ResponseWriter, r *http.Request) {
+// func (r *resource) handlePremise() http.HandlerFunc {
+// 	// any closure logic here
+// 	return func(w http.ResponseWriter, r *http.Request) {
 
-	}
-}
-
-func (r *resource) handlePremise() http.HandlerFunc {
-	// any closure logic here
-	return func(w http.ResponseWriter, r *http.Request) {
-
-	}
-}
+// 	}
+// }

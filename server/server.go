@@ -2,117 +2,141 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"regexp"
 	"syscall"
-	"time"
+
+	"golang.org/x/sync/errgroup"
 )
 
-type resource struct {
-}
-type SapServer struct {
-	resource resource
-	*http.Server
-	Router *http.ServeMux
-}
-
-func NewSapServer(addr string) *SapServer {
-	r := resource{}
-	m := http.NewServeMux()
-	s := &http.Server{
-		Addr:    addr,
-		Handler: m,
+func StartServer() (*UmcServer, error) {
+	log.Print("StartServer: start")
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	u := newUmcServer(ctx)
+	u.routes = u.registerRoutes()
+	if err := u.start(ctx); err != nil {
+		log.Fatal(err)
+		return nil, err
 	}
-	return &SapServer{r, s, m}
-}
-func (s *SapServer) StopServer() error {
-	log.Print("Server Stopped")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer func() {
-		// extra handling here
-		cancel()
-	}()
-
-	if err := s.Server.Shutdown(ctx); err != nil {
-		log.Fatalf("Server Shutdown Failed:%+v", err)
+	if err := u.Errgroup.Wait(); err != nil {
+		log.Printf("exit reason: %s \n", err)
+		return nil, err
 	}
-	log.Print("Server Exited Properly")
+	return u, nil
+}
+func StopServer(server *UmcServer) error {
+	//TODO
+	// 1. Graceful shutdown
+	// 2. Zero downtime
 	return nil
 }
 
-func (s *SapServer) StartServer() error {
+type UmcServer struct {
+	config     *config
+	httpServer *http.Server
+	router     *http.ServeMux
+	routes     []route
+	Errgroup   *errgroup.Group
+	ErrCtx     context.Context
+}
 
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+type config struct {
+	port string
+}
+type route struct {
+	method  string
+	regex   *regexp.Regexp
+	handler http.HandlerFunc
+}
 
-	go func() error {
+type sapServer interface {
+	start(ctx context.Context) error
+	stop(ctx context.Context) error
+	registerRoutes() []route
+}
 
-		err := s.Server.ListenAndServe()
-		if err != nil {
-			return err
-		}
-		return nil
-	}()
-	log.Print("Server Started")
-	<-done
+func loadUmcConfig() *config {
+	log.Print("loadUmcConfig: start")
+	return &config{
+		port: os.Getenv("SAP_UMC_PORT"),
+	}
+}
+func newUmcServer(ctx context.Context) *UmcServer {
+	log.Print("newUmcServer: start")
+	s := &UmcServer{}
+	log.Print("newUmcServer: new server assignment done")
+	s.config = loadUmcConfig()
+	log.Print("loadUmcConfig: ends")
+	s.router = http.NewServeMux()
+	log.Print("mux created")
+	s.httpServer = &http.Server{
+		Addr:    ":" + s.config.port,
+		Handler: s.router,
+		BaseContext: func(_ net.Listener) context.Context {
+			return ctx
+		},
+	}
+	log.Print("httpServer created")
+	return nil
+}
+
+func (s *UmcServer) start(ctx context.Context) error {
+
+	s.Errgroup, s.ErrCtx = errgroup.WithContext(ctx)
+	s.Errgroup.Go(func() error {
+		return s.httpServer.ListenAndServe()
+	})
 
 	return nil
+}
+func (s *UmcServer) stop(ctx context.Context) error {
 
+	s.Errgroup.Go(func() error {
+		<-s.ErrCtx.Done()
+		return s.httpServer.Shutdown(ctx)
+	})
+
+	return nil
 }
 
-/*
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-
-	ctx := r.Context()
-	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))
-	io.WriteString(w, "This is my website!\n")
+func (s *UmcServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.router.ServeHTTP(w, r)
 }
-
-func StartServer() (*http.Server, error) {
-	mux := http.NewServeMux()
-
-	server := &http.Server{
-		Addr:    ":3333",
-		Handler: mux,
+func (s *UmcServer) handleNotFound() http.Handler {
+	return http.NotFoundHandler()
+}
+func (s *UmcServer) handleRootGet() http.HandlerFunc {
+	log.Print("handleRootGet: start")
+	return func(w http.ResponseWriter, r *http.Request) {
+		// if r.Method != http.MethodGet {
+		// 	s.handleNotFound()
+		// 	return
+		// }
+		fmt.Fprint(w, "Hello SAP!")
+		log.Print("handleRootGet: ends")
 	}
-
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-
-	mux.HandleFunc("/", rootHandler)
-	go func() error {
-		err := server.ListenAndServe()
-		if err != nil {
-			return err
-		}
-		return nil
-	}()
-	log.Print("Server Started")
-	<-done
-
-	return server, nil
-
 }
-
-func StopServer(s *http.Server) {
-	log.Print("Server Stopped")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer func() {
-		// extra handling here
-		cancel()
-	}()
-
-	if err := s.Shutdown(ctx); err != nil {
-		log.Fatalf("Server Shutdown Failed:%+v", err)
+func (s *UmcServer) handleGreeting() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "World")
+		log.Print("handleGreeting: ends")
 	}
-	log.Print("Server Exited Properly")
 }
+func (r *UmcServer) Get(pattern string, handler http.HandlerFunc) {
 
-type serverAddr string
+}
+func (s *UmcServer) registerRoutes() []route {
 
-const keyServerAddr serverAddr = "serverAddr"
-*/
+	//TODO
+	log.Print("registerRoutes: start")
+	s.router.HandleFunc("/", s.handleGreeting())
+	log.Print("registerRoutes: ends")
+	return nil
+}

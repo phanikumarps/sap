@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	err := cmd.RunCommand(os.Args[1:])
-	if err != nil {
+
+	if err := cmd.RunCommand(os.Args[1:]); err != nil {
 		log.Println(err)
 		os.Exit(1)
 	}

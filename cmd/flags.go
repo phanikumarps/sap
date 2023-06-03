@@ -32,10 +32,12 @@ func RunCommand(args []string) error {
 }
 
 func cmdServer() error {
+	log.Print("cmdServer: start")
 	cmds := []Execute{
 		newServerCommand(),
 	}
 
+	log.Print("cmdServer: newServerCommand successful")
 	for _, cmd := range cmds {
 		if cmd.Name() == os.Args[1] {
 			cmd.Init(os.Args[0:])
@@ -57,6 +59,7 @@ func newServerCommand() *Command {
 
 func (c *Command) Run() error {
 
+	log.Print("Run: start")
 	switch c.fs.Arg(1) {
 	case "server":
 		log.Println("sub-command", c.fs.Arg(1))
@@ -73,32 +76,28 @@ func (c *Command) Run() error {
 }
 
 func runServerCommands(c *Command) error {
-
+	log.Print("runServerCommands: start")
 	if len(c.fs.Args()) < 3 {
 		return errors.New("subcommands for server missing")
 	}
-
-	var s *server.SapServer
 
 	switch c.fs.Arg(2) {
 	case "ls":
 		log.Printf("server subcommand %s", c.fs.Arg(2))
 	case "start":
 		log.Printf("server subcommand %s", c.fs.Arg(2))
-		s = server.NewSapServer("3333")
-		// s, err := server.StartServer()
-		err := s.StartServer()
-		if err != nil {
-			log.Printf("error listening for server: %s\n", err)
-		}
-		log.Printf("started server at %s", s.Addr)
-	case "stop":
-		log.Printf("server subcommand %s", c.fs.Arg(2))
-		if err := s.StopServer(); err != nil {
+		if _, err := server.StartServer(); err != nil {
 			log.Fatal(err)
 			return err
 		}
-		// server.StopServer(s)
+
+	case "stop":
+		log.Printf("server subcommand %s", c.fs.Arg(2))
+		var umcServer *server.UmcServer
+		if err := server.StopServer(umcServer); err != nil {
+			log.Fatal(err)
+			return err
+		}
 	default:
 		return fmt.Errorf("unknown sub-command %s", c.fs.Arg(2))
 	}
